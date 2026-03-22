@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✨ PuriPuri Studio ✨</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --pink: #FF6EB4;
+    --hot-pink: #FF2D8B;
+    --lilac: #C97FFF;
+    --sky: #74D7FF;
+    --mint: #7FFFD4;
+    --yellow: #FFE566;
+    --bg: #FFF0F8;
+    --white: #FFFFFF;
+    --dark: #3A1A3A;
+    --shadow: rgba(255, 110, 180, 0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(255,110,180,0.15) 0%, transparent 40%),
+      radial-gradient(circle at 90% 80%, rgba(201,127,255,0.15) 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, rgba(116,215,255,0.08) 0%, transparent 60%);
+  }
+
+  /* Floating decorations */
+  .deco {
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+    font-size: 1.5rem;
+    animation: floatDeco 8s ease-in-out infinite;
+    opacity: 0.5;
+  }
+  .deco:nth-child(1) { top: 5%; left: 3%; animation-delay: 0s; }
+  .deco:nth-child(2) { top: 15%; right: 5%; animation-delay: 1.5s; }
+  .deco:nth-child(3) { bottom: 20%; left: 2%; animation-delay: 3s; }
+  .deco:nth-child(4) { bottom: 10%; right: 3%; animation-delay: 4.5s; }
+  .deco:nth-child(5) { top: 50%; left: 1%; animation-delay: 2s; }
+
+  @keyframes floatDeco {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(10deg); }
+  }
+
+  .app-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 20px 0 10px;
+    animation: slideDown 0.6s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .logo {
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-weight: 900;
+    font-size: 2.8rem;
+    background: linear-gradient(135deg, var(--hot-pink), var(--lilac), var(--sky));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(2px 2px 0px rgba(255,45,139,0.3));
+    letter-spacing: 0.05em;
+  }
+
+  .tagline {
+    font-size: 0.85rem;
+    color: var(--pink);
+    letter-spacing: 0.15em;
+    margin-top: 4px;
+  }
+
+  /* Tab Navigation */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin: 20px 0 16px;
+    flex-wrap: wrap;
+  }
+
+  .tab-btn {
+    background: white;
+    border: 2.5px solid var(--pink);
+    color: var(--hot-pink);
+    padding: 8px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    transition: all 0.2s;
+    box-shadow: 2px 2px 0 var(--shadow);
+  }
+
+  .tab-btn:hover { transform: translateY(-2px); box-shadow: 3px 4px 0 var(--shadow); }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, var(--hot-pink), var(--lilac));
+    border-color: transparent;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 3px 4px 0 var(--shadow);
+  }
+
+  /* Main layout */
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 16px;
+    align-items: start;
+  }
+
+  @media (max-width: 700px) {
+    .main { grid-template-columns: 1fr; }
+  }
+
+  /* Camera / Canvas section */
+  .camera-section {
+    background: white;
+    border-radius: 24px;
+    border: 3px solid var(--pink);
+    box-shadow: 4px 4px 0 var(--shadow);
+    overflow: hidden;
+    animation: fadeIn 0.5s ease 0.2s both;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.97); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .camera-header {
+    background: linear-gradient(135deg, var(--hot-pink), var(--lilac));
+    color: white;
+    padding: 10px 16px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .camera-body {
+    position: relative;
+    aspect-ratio: 4/3;
+    background: #111;
+    overflow: hidden;
+    cursor: crosshair;
+  }
+
+  #videoEl {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  #canvasEl {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: none;
+    position: absolute;
+    top: 0; left: 0;
+  }
+
+  /* Frame overlay */
+  #frameOverlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* Sticker layer on video */
+  #stickerLayer {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 20;
+    pointer-events: all;
+  }
+
+  .placed-sticker {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    font-size: 2.5rem;
+    line-height: 1;
+    transform-origin: center;
+    transition: transform 0.1s;
+  }
+
+  .placed-sticker:hover { transform: scale(1.1) rotate(5deg); }
+  .placed-sticker.selected {
+    outline: 2px dashed var(--pink);
+    outline-offset: 4px;
+  }
+
+  .sticker-del {
+    position: absolute;
+    top: -10px; right: -10px;
+    background: var(--hot-pink);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    font-size: 0.65rem;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    z-index: 30;
+  }
+
+  .placed-sticker.selected .sticker-del { display: flex; }
+
+  /* Filter indicator */
+  .filter-badge {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: rgba(255,255,255,0.85);
+    border: 2px solid var(--pink);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--hot-pink);
+    z-index: 5;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Camera controls */
+  .camera-controls {
+    padding: 14px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    border-top: 2px dashed rgba(255,110,180,0.2);
+  }
+
+  .btn {
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: translateY(0) scale(0.97); }
+
+  .btn-snap {
+    background: linear-gradient(135deg, var(--hot-pink), #FF6EB4);
+    color: white;
+    padding: 10px 22px;
+    font-size: 1rem;
+    box-shadow: 0 4px 15px rgba(255,45,139,0.4);
+    flex: 1;
+  }
+
+  .btn-snap:hover { box-shadow: 0 6px 20px rgba(255,45,139,0.5); }
+
+  .btn-retake {
+    background: white;
+    border: 2.5px solid var(--pink);
+    color: var(--hot-pink);
+    padding: 10px 18px;
+    font-size: 0.9rem;
+  }
+
+  .btn-save {
+    background: linear-gradient(135deg, var(--lilac), var(--sky));
+    color: white;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(201,127,255,0.4);
+  }
+
+  .btn-cam {
+    background: white;
+    border: 2.5px solid var(--sky);
+    color: #0099CC;
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  /* Countdown overlay */
+  #countdown {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Zen Maru Gothic', sans-serif;
+    font-size: 7rem;
+    font-weight: 900;
+    color: white;
+    text-shadow: 0 0 30px var(--hot-pink), 0 0 60px var(--lilac);
+    z-index: 50;
+    pointer-events: none;
+    display: none;
+    animation: countPop 0.5s ease;
+  }
+
+  @keyframes countPop {
+    0% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  .flash {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: white;
+    z-index: 100;
+    opacity: 0;
+    pointer-events: none;
+    animation: flashAnim 0.4s ease forwards;
+  }
+
+  @keyframes flashAnim {
+    0% { opacity: 0; }
+    30% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+
+  /* Sidebar panels */
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    animation: fadeIn 0.5s ease 0.4s both;
+  }
+
+  .panel {
+    background: white;
+    border-radius: 20px;
+    border: 2.5px solid rgba(255,110,180,0.3);
+    box-shadow: 3px 3px 0 rgba(255,110,180,0.15);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    background: linear-gradient(135deg, rgba(255,110,180,0.1), rgba(201,127,255,0.1));
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--hot-pink);
+    border-bottom: 1.5px dashed rgba(255,110,180,0.2);
+    letter-spacing: 0.05em;
+  }
+
+  .panel-body { padding: 12px; }
+
+  /* Filter grid */
+  .filter-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .filter-item {
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 6px 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    background: rgba(255,240,248,0.5);
+  }
+
+  .filter-item:hover { transform: scale(1.05); border-color: var(--pink); }
+  .filter-item.active { border-color: var(--hot-pink); background: rgba(255,110,180,0.1); }
+
+  .filter-preview {
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #FFB3D9, #E0B3FF);
+    margin-bottom: 4px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .filter-name { font-size: 0.65rem; font-weight: 700; color: var(--dark); }
+
+  /* Sticker grid */
+  .sticker-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .sticker-tab {
+    background: rgba(255,240,248,0.7);
+    border: 1.5px solid rgba(255,110,180,0.3);
+    color: var(--hot-pink);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .sticker-tab.active {
+    background: var(--hot-pink);
+    color: white;
+    border-color: var(--hot-pink);
+  }
+
+  .sticker-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+  }
+
+  .sticker-btn {
+    background: rgba(255,240,248,0.5);
+    border: 1.5px solid rgba(255,110,180,0.2);
+    border-radius: 10px;
+    padding: 6px 4px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.5rem;
+    transition: all 0.15s;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sticker-btn:hover {
+    transform: scale(1.2) rotate(-5deg);
+    border-color: var(--pink);
+    background: rgba(255,110,180,0.1);
+    box-shadow: 0 3px 10px var(--shadow);
+  }
+
+  /* Frame options */
+  .frame-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .frame-item {
+    border: 2px solid transparent;
+    border-radius: 12px;
+    padding: 6px;
+    cursor: pointer;
+    text-align: center;
+    background: rgba(255,240,248,0.5);
+    transition: all 0.2s;
+  }
+
+  .frame-item:hover { transform: scale(1.05); border-color: var(--lilac); }
+  .frame-item.active { border-color: var(--lilac); background: rgba(201,127,255,0.1); }
+
+  .frame-preview {
+    width: 100%;
+    aspect-ratio: 4/3;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+  }
+
+  .frame-name { font-size: 0.65rem; font-weight: 700; color: var(--dark); }
+
+  /* Text tool */
+  .text-tool {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .text-input-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .text-input {
+    flex: 1;
+    border: 2px solid rgba(255,110,180,0.3);
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-size: 0.85rem;
+    outline: none;
+    background: rgba(255,240,248,0.5);
+    color: var(--dark);
+  }
+
+  .text-input:focus { border-color: var(--pink); }
+
+  .color-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .color-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+
+  .color-dot:hover, .color-dot.active { border-color: var(--dark); transform: scale(1.15); }
+
+  .btn-add-text {
+    background: linear-gradient(135deg, var(--yellow), #FFB347);
+    color: var(--dark);
+    padding: 7px 14px;
+    font-size: 0.8rem;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-weight: 700;
+    transition: all 0.2s;
+  }
+
+  .btn-add-text:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(255,229,102,0.5); }
+
+  /* Photo strip */
+  .strip-section {
+    margin-top: 20px;
+    background: white;
+    border-radius: 20px;
+    border: 2.5px solid rgba(255,110,180,0.3);
+    box-shadow: 3px 3px 0 rgba(255,110,180,0.15);
+    overflow: hidden;
+    animation: fadeIn 0.5s ease 0.6s both;
+  }
+
+  .strip-header {
+    background: linear-gradient(135deg, rgba(255,229,102,0.2), rgba(255,110,180,0.1));
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #CC8800;
+    border-bottom: 1.5px dashed rgba(255,229,102,0.4);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .strip-body {
+    padding: 12px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    min-height: 80px;
+    align-items: center;
+  }
+
+  .strip-body::-webkit-scrollbar { height: 4px; }
+  .strip-body::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 10px; }
+
+  .strip-photo {
+    flex-shrink: 0;
+    width: 90px;
+    height: 70px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2.5px solid var(--pink);
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .strip-photo:hover { transform: scale(1.08) rotate(-2deg); border-color: var(--hot-pink); }
+
+  .strip-photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+
+  .strip-photo .del-photo {
+    position: absolute;
+    top: 2px; right: 2px;
+    background: rgba(255,45,139,0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 18px; height: 18px;
+    font-size: 0.6rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .strip-photo:hover .del-photo { opacity: 1; }
+
+  .strip-empty {
+    color: rgba(255,110,180,0.4);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-align: center;
+    flex: 1;
+  }
+
+  .btn-clear-strip {
+    background: rgba(255,110,180,0.1);
+    border: 1.5px solid var(--pink);
+    color: var(--hot-pink);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+  }
+
+  /* Toast notification */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: linear-gradient(135deg, var(--hot-pink), var(--lilac));
+    color: white;
+    padding: 10px 24px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    opacity: 0;
+    transition: all 0.4s;
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: 0 4px 20px rgba(255,45,139,0.5);
+    white-space: nowrap;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Video filters applied via CSS */
+  .filter-none { filter: none; }
+  .filter-kawaii { filter: brightness(1.1) saturate(1.3) contrast(0.9); }
+  .filter-vintage { filter: sepia(0.5) brightness(0.9) contrast(1.1); }
+  .filter-dreamy { filter: brightness(1.2) contrast(0.85) saturate(1.2) blur(0.3px); }
+  .filter-vivid { filter: saturate(1.8) contrast(1.1) brightness(1.05); }
+  .filter-cool { filter: hue-rotate(20deg) saturate(1.2) brightness(1.05); }
+  .filter-warm { filter: sepia(0.3) saturate(1.4) brightness(1.1); }
+  .filter-mono { filter: grayscale(1) contrast(1.1); }
+  .filter-neon { filter: brightness(1.05) saturate(2) contrast(1.15) hue-rotate(10deg); }
+  .filter-pastel { filter: brightness(1.15) saturate(0.7) contrast(0.85); }
+  .filter-sketch { filter: grayscale(1) brightness(1.5) contrast(2); }
+  .filter-golden { filter: sepia(0.6) saturate(1.6) brightness(1.1) contrast(0.95); }
+
+  .no-camera-msg {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  .no-camera-msg .icon { font-size: 3rem; display: block; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<!-- Decorations -->
+<div class="deco">🌸</div>
+<div class="deco">✨</div>
+<div class="deco">🎀</div>
+<div class="deco">💫</div>
+<div class="deco">🌟</div>
+
+<div class="app-wrapper">
+  <!-- Header -->
+  <div class="header">
+    <div class="logo">✨ PuriPuri Studio ✨</div>
+    <div class="tagline">〜 かわいいを、もっとかわいく 〜</div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchPanel('filters')">🎨 フィルター</button>
+    <button class="tab-btn" onclick="switchPanel('stickers')">🌸 スタンプ</button>
+    <button class="tab-btn" onclick="switchPanel('frames')">🖼️ フレーム</button>
+    <button class="tab-btn" onclick="switchPanel('text')">✏️ テキスト</button>
+  </div>
+
+  <div class="main">
+    <!-- Camera / Canvas -->
+    <div class="camera-section">
+      <div class="camera-header">
+        <span>📷</span>
+        <span id="camLabel">カメラ</span>
+      </div>
+      <div class="camera-body" id="cameraBody">
+        <video id="videoEl" autoplay muted playsinline></video>
+        <canvas id="canvasEl"></canvas>
+        <div id="frameOverlay"></div>
+        <div id="stickerLayer"></div>
+        <div class="filter-badge" id="filterBadge">フィルターなし</div>
+        <div id="countdown"></div>
+        <div class="no-camera-msg" id="noCameraMsg" style="display:none">
+          <span class="icon">📷</span>
+          カメラを起動してください
+        </div>
+      </div>
+      <div class="camera-controls">
+        <button class="btn btn-cam" id="startBtn" onclick="startCamera()">📷 起動</button>
+        <button class="btn btn-snap" id="snapBtn" onclick="takePhoto()" disabled>⚡ 撮影！</button>
+        <button class="btn btn-retake" id="retakeBtn" onclick="retake()" style="display:none">🔄 撮り直し</button>
+        <button class="btn btn-save" id="saveBtn" onclick="savePhoto()" style="display:none">💾 保存</button>
+        <button class="btn btn-cam" onclick="toggleMirror()" title="ミラー">🪞</button>
+        <button class="btn btn-cam" onclick="setTimer()" id="timerBtn" title="タイマー">⏱️ 3秒</button>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <!-- Filters Panel -->
+      <div class="panel" id="panel-filters">
+        <div class="panel-header">🎨 フィルター</div>
+        <div class="panel-body">
+          <div class="filter-grid" id="filterGrid"></div>
+        </div>
+      </div>
+
+      <!-- Stickers Panel -->
+      <div class="panel" id="panel-stickers" style="display:none">
+        <div class="panel-header">🌸 スタンプ</div>
+        <div class="panel-body">
+          <div class="sticker-tabs" id="stickerTabs"></div>
+          <div class="sticker-grid" id="stickerGrid"></div>
+        </div>
+      </div>
+
+      <!-- Frames Panel -->
+      <div class="panel" id="panel-frames" style="display:none">
+        <div class="panel-header">🖼️ フレーム</div>
+        <div class="panel-body">
+          <div class="frame-grid" id="frameGrid"></div>
+        </div>
+      </div>
+
+      <!-- Text Panel -->
+      <div class="panel" id="panel-text" style="display:none">
+        <div class="panel-header">✏️ テキスト追加</div>
+        <div class="panel-body">
+          <div class="text-tool">
+            <div class="text-input-row">
+              <input type="text" class="text-input" id="textInput" placeholder="テキストを入力…" maxlength="20">
+            </div>
+            <div class="color-row" id="colorPicker"></div>
+            <div class="color-row">
+              <span style="font-size:0.75rem;font-weight:700;color:#888">サイズ:</span>
+              <input type="range" min="16" max="60" value="28" id="fontSizeSlider" style="flex:1;accent-color:var(--pink)">
+            </div>
+            <button class="btn-add-text" onclick="addText()">✨ 追加する</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Photo Strip -->
+  <div class="strip-section">
+    <div class="strip-header">
+      <span>🎞️ 撮った写真</span>
+      <button class="btn-clear-strip" onclick="clearStrip()">全削除</button>
+    </div>
+    <div class="strip-body" id="stripBody">
+      <div class="strip-empty">まだ写真がありません。撮影してみよう！🌸</div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========== State ==========
+let stream = null;
+let currentFilter = 'none';
+let currentFrame = 'none';
+let activePanel = 'filters';
+let isPhotoMode = false;
+let isMirrored = true;
+let useTimer = true;
+let photos = [];
+let placedStickers = [];
+let selectedStickerEl = null;
+let textColor = '#FF2D8B';
+let dragState = null;
+
+// ========== Data ==========
+const filters = [
+  { id: 'none', name: 'なし', emoji: '📷', cssClass: 'filter-none' },
+  { id: 'kawaii', name: 'かわいい', emoji: '🌸', cssClass: 'filter-kawaii' },
+  { id: 'vintage', name: 'ヴィンテージ', emoji: '🎞️', cssClass: 'filter-vintage' },
+  { id: 'dreamy', name: 'ゆめかわ', emoji: '🌙', cssClass: 'filter-dreamy' },
+  { id: 'vivid', name: 'ビビッド', emoji: '🌈', cssClass: 'filter-vivid' },
+  { id: 'cool', name: 'クール', emoji: '❄️', cssClass: 'filter-cool' },
+  { id: 'warm', name: 'あったか', emoji: '🌅', cssClass: 'filter-warm' },
+  { id: 'mono', name: 'モノクロ', emoji: '🖤', cssClass: 'filter-mono' },
+  { id: 'neon', name: 'ネオン', emoji: '💜', cssClass: 'filter-neon' },
+  { id: 'pastel', name: 'パステル', emoji: '🎀', cssClass: 'filter-pastel' },
+  { id: 'sketch', name: 'スケッチ', emoji: '✏️', cssClass: 'filter-sketch' },
+  { id: 'golden', name: 'ゴールド', emoji: '✨', cssClass: 'filter-golden' },
+];
+
+const filterCSS = {
+  none: '', kawaii: 'brightness(1.1) saturate(1.3) contrast(0.9)',
+  vintage: 'sepia(0.5) brightness(0.9) contrast(1.1)',
+  dreamy: 'brightness(1.2) contrast(0.85) saturate(1.2)',
+  vivid: 'saturate(1.8) contrast(1.1) brightness(1.05)',
+  cool: 'hue-rotate(20deg) saturate(1.2) brightness(1.05)',
+  warm: 'sepia(0.3) saturate(1.4) brightness(1.1)',
+  mono: 'grayscale(1) contrast(1.1)',
+  neon: 'brightness(1.05) saturate(2) contrast(1.15) hue-rotate(10deg)',
+  pastel: 'brightness(1.15) saturate(0.7) contrast(0.85)',
+  sketch: 'grayscale(1) brightness(1.5) contrast(2)',
+  golden: 'sepia(0.6) saturate(1.6) brightness(1.1) contrast(0.95)',
+};
+
+const stickerCategories = {
+  '動物': ['🐱','🐶','🐰','🐼','🦊','🐸','🐹','🦁','🐨','🦋'],
+  '花・植物': ['🌸','🌺','🌻','🌹','🍀','🌼','🌷','🌿','🍁','🌸'],
+  'キラキラ': ['✨','💫','⭐','🌟','💥','🔥','❄️','🌈','☀️','🌙'],
+  'ハート': ['❤️','💕','💖','💗','💓','💝','💞','💛','💚','💙'],
+  'フード': ['🍓','🍰','🧁','🍩','🍭','🍦','🍫','🍬','🎂','🍡'],
+  'アイテム': ['🎀','🎵','🎶','🎮','💎','👑','🎪','🎠','🎡','🪄'],
+};
+
+const frames = [
+  { id: 'none', name: 'なし', emoji: '⬜', draw: null },
+  { id: 'hearts', name: 'ハート', emoji: '💕', draw: drawHeartsFrame },
+  { id: 'flowers', name: 'お花', emoji: '🌸', draw: drawFlowersFrame },
+  { id: 'stars', name: 'スター', emoji: '⭐', draw: drawStarsFrame },
+  { id: 'rainbow', name: 'レインボー', emoji: '🌈', draw: drawRainbowFrame },
+  { id: 'cute', name: 'キュート', emoji: '🎀', draw: drawCuteFrame },
+];
+
+const textColors = ['#FF2D8B','#FF6EB4','#C97FFF','#74D7FF','#7FFFD4','#FFE566','#FF6347','#FFFFFF','#3A1A3A'];
+
+// ========== Init ==========
+function init() {
+  buildFilterGrid();
+  buildStickerTabs();
+  buildFrameGrid();
+  buildColorPicker();
+  document.getElementById('noCameraMsg').style.display = 'flex';
+  document.getElementById('noCameraMsg').style.flexDirection = 'column';
+  document.getElementById('noCameraMsg').style.alignItems = 'center';
+}
+
+// ========== Camera ==========
+async function startCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 1280, height: 960 }, audio: false });
+    const video = document.getElementById('videoEl');
+    video.srcObject = stream;
+    video.style.transform = isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+    applyVideoFilter();
+    document.getElementById('noCameraMsg').style.display = 'none';
+    document.getElementById('snapBtn').disabled = false;
+    document.getElementById('startBtn').style.display = 'none';
+    document.getElementById('camLabel').textContent = '撮影モード';
+    showToast('📷 カメラが起動しました！');
+  } catch(e) {
+    showToast('⚠️ カメラを起動できませんでした');
+    document.getElementById('noCameraMsg').style.display = 'flex';
+  }
+}
+
+function applyVideoFilter() {
+  const video = document.getElementById('videoEl');
+  const f = filterCSS[currentFilter] || '';
+  video.style.filter = f;
+}
+
+function toggleMirror() {
+  isMirrored = !isMirrored;
+  const video = document.getElementById('videoEl');
+  video.style.transform = isMirrored ? 'scaleX(-1)' : 'scaleX(1)';
+  showToast(isMirrored ? '🪞 ミラーON' : '🪞 ミラーOFF');
+}
+
+function setTimer() {
+  useTimer = !useTimer;
+  document.getElementById('timerBtn').textContent = useTimer ? '⏱️ 3秒' : '⚡ 即撮';
+  showToast(useTimer ? '⏱️ タイマー3秒ON' : '⚡ 即撮モードON');
+}
+
+// ========== Capture ==========
+async function takePhoto() {
+  if (!stream && !isPhotoMode) {
+    showToast('まずカメラを起動してください！');
+    return;
+  }
+  if (useTimer) {
+    await countdown();
+  }
+  capture();
+}
+
+function countdown() {
+  return new Promise(resolve => {
+    const el = document.getElementById('countdown');
+    let count = 3;
+    el.style.display = 'block';
+    el.textContent = count;
+    const interval = setInterval(() => {
+      count--;
+      if (count > 0) {
+        el.style.display = 'none';
+        setTimeout(() => {
+          el.style.display = 'block';
+          el.textContent = count;
+          el.style.animation = 'none';
+          el.offsetHeight;
+          el.style.animation = 'countPop 0.5s ease';
+        }, 50);
+      } else {
+        el.textContent = '📸';
+        el.style.animation = 'none';
+        el.offsetHeight;
+        el.style.animation = 'countPop 0.3s ease';
+        clearInterval(interval);
+        setTimeout(() => {
+          el.style.display = 'none';
+          resolve();
+        }, 400);
+      }
+    }, 900);
+  });
+}
+
+function capture() {
+  const video = document.getElementById('videoEl');
+  const canvas = document.getElementById('canvasEl');
+  const ctx = canvas.getContext('2d');
+  const body = document.getElementById('cameraBody');
+  const w = body.offsetWidth;
+  const h = body.offsetHeight;
+  canvas.width = w;
+  canvas.height = h;
+
+  ctx.save();
+  if (isMirrored) { ctx.translate(w, 0); ctx.scale(-1, 1); }
+  if (filterCSS[currentFilter]) ctx.filter = filterCSS[currentFilter];
+  ctx.drawImage(video, 0, 0, w, h);
+  ctx.restore();
+  ctx.filter = 'none';
+
+  // Draw frame
+  drawFrame(ctx, w, h);
+
+  // Draw stickers
+  const stickerLayer = document.getElementById('stickerLayer');
+  const stickers = stickerLayer.querySelectorAll('.placed-sticker');
+  stickers.forEach(s => {
+    const x = parseFloat(s.style.left);
+    const y = parseFloat(s.style.top);
+    const size = parseFloat(s.style.fontSize) || 40;
+    const rot = parseFloat(s.dataset.rot || 0);
+    ctx.save();
+    ctx.translate(x + size/2, y + size/2);
+    ctx.rotate(rot * Math.PI / 180);
+    ctx.font = `${size}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(s.dataset.emoji, 0, 0);
+    ctx.restore();
+  });
+
+  // Draw texts
+  stickerLayer.querySelectorAll('.placed-text').forEach(t => {
+    const x = parseFloat(t.style.left);
+    const y = parseFloat(t.style.top);
+    const color = t.dataset.color || '#FF2D8B';
+    const size = parseFloat(t.dataset.size || 28);
+    ctx.save();
+    ctx.font = `bold ${size}px "M PLUS Rounded 1c", sans-serif`;
+    ctx.fillStyle = color;
+    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+    ctx.lineWidth = 3;
+    ctx.strokeText(t.dataset.text, x, y + size);
+    ctx.fillText(t.dataset.text, x, y + size);
+    ctx.restore();
+  });
+
+  // Flash effect
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  document.getElementById('cameraBody').appendChild(flash);
+  setTimeout(() => flash.remove(), 500);
+
+  video.style.display = 'none';
+  canvas.style.display = 'block';
+  canvas.style.position = 'absolute';
+  canvas.style.top = '0'; canvas.style.left = '0';
+  canvas.style.width = '100%'; canvas.style.height = '100%';
+  isPhotoMode = true;
+
+  document.getElementById('snapBtn').style.display = 'none';
+  document.getElementById('retakeBtn').style.display = 'inline-flex';
+  document.getElementById('saveBtn').style.display = 'inline-flex';
+  document.getElementById('camLabel').textContent = '📸 撮影完了！';
+
+  addToStrip(canvas.toDataURL('image/png'));
+  showToast('📸 撮れたよ！かわいい～！');
+}
+
+function retake() {
+  const video = document.getElementById('videoEl');
+  const canvas = document.getElementById('canvasEl');
+  video.style.display = 'block';
+  canvas.style.display = 'none';
+  isPhotoMode = false;
+  document.getElementById('snapBtn').style.display = 'inline-flex';
+  document.getElementById('retakeBtn').style.display = 'none';
+  document.getElementById('saveBtn').style.display = 'none';
+  document.getElementById('camLabel').textContent = '撮影モード';
+}
+
+function savePhoto() {
+  const canvas = document.getElementById('canvasEl');
+  const link = document.createElement('a');
+  link.download = `puripuri_${Date.now()}.png`;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showToast('💾 保存しました！');
+}
+
+// ========== Strip ==========
+function addToStrip(dataUrl) {
+  photos.push(dataUrl);
+  renderStrip();
+}
+
+function renderStrip() {
+  const body = document.getElementById('stripBody');
+  if (photos.length === 0) {
+    body.innerHTML = '<div class="strip-empty">まだ写真がありません。撮影してみよう！🌸</div>';
+    return;
+  }
+  body.innerHTML = '';
+  photos.forEach((src, i) => {
+    const div = document.createElement('div');
+    div.className = 'strip-photo';
+    div.innerHTML = `<img src="${src}" alt="photo ${i+1}"><button class="del-photo" onclick="deletePhoto(${i})">✕</button>`;
+    div.onclick = (e) => { if (!e.target.classList.contains('del-photo')) loadPhoto(i); };
+    body.appendChild(div);
+  });
+}
+
+function deletePhoto(i) {
+  photos.splice(i, 1);
+  renderStrip();
+}
+
+function loadPhoto(i) {
+  const canvas = document.getElementById('canvasEl');
+  const img = new Image();
+  img.onload = () => {
+    const ctx = canvas.getContext('2d');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    ctx.drawImage(img, 0, 0);
+    canvas.style.display = 'block';
+    document.getElementById('videoEl').style.display = 'none';
+    isPhotoMode = true;
+    document.getElementById('snapBtn').style.display = 'none';
+    document.getElementById('retakeBtn').style.display = 'inline-flex';
+    document.getElementById('saveBtn').style.display = 'inline-flex';
+    document.getElementById('camLabel').textContent = '📷 写真を表示中';
+  };
+  img.src = photos[i];
+}
+
+function clearStrip() {
+  photos = [];
+  renderStrip();
+  showToast('🗑️ 写真を全部削除しました');
+}
+
+// ========== Filters ==========
+function buildFilterGrid() {
+  const grid = document.getElementById('filterGrid');
+  filters.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'filter-item' + (f.id === 'none' ? ' active' : '');
+    div.innerHTML = `<div class="filter-preview" style="filter:${filterCSS[f.id]||'none'}">${f.emoji}</div><div class="filter-name">${f.name}</div>`;
+    div.onclick = () => selectFilter(f.id, div);
+    grid.appendChild(div);
+  });
+}
+
+function selectFilter(id, el) {
+  document.querySelectorAll('.filter-item').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  currentFilter = id;
+  applyVideoFilter();
+  const f = filters.find(x => x.id === id);
+  document.getElementById('filterBadge').textContent = f ? f.name : 'なし';
+  showToast(`🎨 ${f.name}フィルター`);
+}
+
+// ========== Stickers ==========
+let currentStickerCat = Object.keys(stickerCategories)[0];
+
+function buildStickerTabs() {
+  const tabs = document.getElementById('stickerTabs');
+  Object.keys(stickerCategories).forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'sticker-tab' + (i === 0 ? ' active' : '');
+    btn.textContent = cat;
+    btn.onclick = () => selectStickerCat(cat, btn);
+    tabs.appendChild(btn);
+  });
+  buildStickerGrid(currentStickerCat);
+}
+
+function selectStickerCat(cat, el) {
+  document.querySelectorAll('.sticker-tab').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  currentStickerCat = cat;
+  buildStickerGrid(cat);
+}
+
+function buildStickerGrid(cat) {
+  const grid = document.getElementById('stickerGrid');
+  grid.innerHTML = '';
+  (stickerCategories[cat] || []).forEach(emoji => {
+    const btn = document.createElement('button');
+    btn.className = 'sticker-btn';
+    btn.textContent = emoji;
+    btn.onclick = () => placeSticker(emoji);
+    grid.appendChild(btn);
+  });
+}
+
+function placeSticker(emoji) {
+  const layer = document.getElementById('stickerLayer');
+  const body = document.getElementById('cameraBody');
+  const w = body.offsetWidth;
+  const h = body.offsetHeight;
+
+  const el = document.createElement('div');
+  el.className = 'placed-sticker';
+  el.dataset.emoji = emoji;
+  el.dataset.rot = Math.floor(Math.random() * 20 - 10);
+  el.style.left = (Math.random() * (w - 60) + 10) + 'px';
+  el.style.top = (Math.random() * (h - 60) + 10) + 'px';
+  el.style.fontSize = '2.5rem';
+  el.style.transform = `rotate(${el.dataset.rot}deg)`;
+  el.textContent = emoji;
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'sticker-del';
+  delBtn.textContent = '✕';
+  delBtn.onclick = (e) => { e.stopPropagation(); el.remove(); };
+  el.appendChild(delBtn);
+
+  makeDraggable(el, layer);
+  el.onclick = (e) => { e.stopPropagation(); selectSticker(el); };
+
+  layer.appendChild(el);
+  selectSticker(el);
+  showToast(`${emoji} スタンプを追加！`);
+}
+
+function selectSticker(el) {
+  if (selectedStickerEl) selectedStickerEl.classList.remove('selected');
+  selectedStickerEl = el;
+  el.classList.add('selected');
+}
+
+document.addEventListener('click', () => {
+  if (selectedStickerEl) { selectedStickerEl.classList.remove('selected'); selectedStickerEl = null; }
+});
+
+function makeDraggable(el, container) {
+  let startX, startY, origLeft, origTop;
+  el.addEventListener('mousedown', (e) => {
+    if (e.target.classList.contains('sticker-del')) return;
+    e.preventDefault();
+    startX = e.clientX; startY = e.clientY;
+    origLeft = parseFloat(el.style.left); origTop = parseFloat(el.style.top);
+    const move = (ev) => {
+      el.style.left = (origLeft + ev.clientX - startX) + 'px';
+      el.style.top = (origTop + ev.clientY - startY) + 'px';
+    };
+    const up = () => { document.removeEventListener('mousemove', move); document.removeEventListener('mouseup', up); };
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+  });
+  el.addEventListener('touchstart', (e) => {
+    if (e.target.classList.contains('sticker-del')) return;
+    const t = e.touches[0];
+    startX = t.clientX; startY = t.clientY;
+    origLeft = parseFloat(el.style.left); origTop = parseFloat(el.style.top);
+    const move = (ev) => {
+      const tt = ev.touches[0];
+      el.style.left = (origLeft + tt.clientX - startX) + 'px';
+      el.style.top = (origTop + tt.clientY - startY) + 'px';
+    };
+    const end = () => { document.removeEventListener('touchmove', move); document.removeEventListener('touchend', end); };
+    document.addEventListener('touchmove', move, { passive: true });
+    document.addEventListener('touchend', end);
+  }, { passive: true });
+}
+
+// ========== Frames ==========
+function buildFrameGrid() {
+  const grid = document.getElementById('frameGrid');
+  frames.forEach(f => {
+    const div = document.createElement('div');
+    div.className = 'frame-item' + (f.id === 'none' ? ' active' : '');
+    div.innerHTML = `<div class="frame-preview">${f.emoji}</div><div class="frame-name">${f.name}</div>`;
+    div.onclick = () => selectFrame(f.id, div);
+    grid.appendChild(div);
+  });
+}
+
+function selectFrame(id, el) {
+  document.querySelectorAll('.frame-item').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  currentFrame = id;
+  renderFrameOverlay();
+  const f = frames.find(x => x.id === id);
+  showToast(`🖼️ ${f.name}フレーム`);
+}
+
+function renderFrameOverlay() {
+  const overlay = document.getElementById('frameOverlay');
+  const body = document.getElementById('cameraBody');
+  const canvas = document.createElement('canvas');
+  canvas.width = body.offsetWidth;
+  canvas.height = body.offsetHeight;
+  const ctx = canvas.getContext('2d');
+  const frame = frames.find(f => f.id === currentFrame);
+  if (frame && frame.draw) {
+    frame.draw(ctx, canvas.width, canvas.height, false);
+  }
+  overlay.innerHTML = '';
+  if (currentFrame !== 'none') {
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0'; canvas.style.left = '0';
+    canvas.style.pointerEvents = 'none';
+    overlay.appendChild(canvas);
+  }
+}
+
+function drawFrame(ctx, w, h) {
+  const frame = frames.find(f => f.id === currentFrame);
+  if (frame && frame.draw) { frame.draw(ctx, w, h, true); }
+}
+
+function drawHeartsFrame(ctx, w, h) {
+  ctx.font = `${Math.floor(w * 0.06)}px serif`;
+  const hearts = ['💕','❤️','💖','💗','💓','💝'];
+  const step = w / 6;
+  for (let i = 0; i < 7; i++) {
+    ctx.fillText(hearts[i % hearts.length], i * step - 10, 30);
+    ctx.fillText(hearts[(i+2) % hearts.length], i * step - 10, h - 5);
+  }
+  const vstep = h / 6;
+  for (let i = 1; i < 6; i++) {
+    ctx.fillText(hearts[i % hearts.length], 2, i * vstep);
+    ctx.fillText(hearts[(i+1) % hearts.length], w - 35, i * vstep);
+  }
+}
+
+function drawFlowersFrame(ctx, w, h) {
+  ctx.font = `${Math.floor(w * 0.06)}px serif`;
+  const flowers = ['🌸','🌺','🌻','🌹','🌼'];
+  const step = w / 6;
+  for (let i = 0; i < 7; i++) {
+    ctx.fillText(flowers[i % flowers.length], i * step - 10, 30);
+    ctx.fillText(flowers[(i+2) % flowers.length], i * step - 10, h - 5);
+  }
+  const vstep = h / 5;
+  for (let i = 1; i < 5; i++) {
+    ctx.fillText(flowers[i % flowers.length], 2, i * vstep);
+    ctx.fillText(flowers[(i+1) % flowers.length], w - 35, i * vstep);
+  }
+}
+
+function drawStarsFrame(ctx, w, h) {
+  ctx.font = `${Math.floor(w * 0.05)}px serif`;
+  const stars = ['⭐','✨','💫','🌟','⚡'];
+  const step = w / 7;
+  for (let i = 0; i < 8; i++) {
+    ctx.fillText(stars[i % stars.length], i * step - 5, 28);
+    ctx.fillText(stars[(i+1) % stars.length], i * step - 5, h - 3);
+  }
+  const vstep = h / 5;
+  for (let i = 1; i < 5; i++) {
+    ctx.fillText(stars[i % stars.length], 2, i * vstep);
+    ctx.fillText(stars[(i+2) % stars.length], w - 30, i * vstep);
+  }
+}
+
+function drawRainbowFrame(ctx, w, h) {
+  const colors = ['#FF0000','#FF7700','#FFEE00','#00CC00','#0088FF','#8800FF'];
+  const bw = 6;
+  colors.forEach((c, i) => {
+    ctx.strokeStyle = c;
+    ctx.lineWidth = bw;
+    ctx.strokeRect(bw * i + bw/2, bw * i + bw/2, w - bw * i * 2 - bw, h - bw * i * 2 - bw);
+  });
+}
+
+function drawCuteFrame(ctx, w, h) {
+  // Pink border
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0, 'rgba(255,110,180,0.7)');
+  grad.addColorStop(0.5, 'rgba(201,127,255,0.7)');
+  grad.addColorStop(1, 'rgba(116,215,255,0.7)');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 14;
+  ctx.strokeRect(7, 7, w - 14, h - 14);
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+  ctx.strokeRect(16, 16, w - 32, h - 32);
+  // Corner ribbons
+  ctx.font = `${Math.floor(w * 0.07)}px serif`;
+  ctx.fillText('🎀', 2, 36);
+  ctx.fillText('🎀', w - 36, 36);
+  ctx.fillText('🎀', 2, h - 2);
+  ctx.fillText('🎀', w - 36, h - 2);
+}
+
+// ========== Text ==========
+function buildColorPicker() {
+  const row = document.getElementById('colorPicker');
+  textColors.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'color-dot' + (c === textColor ? ' active' : '');
+    div.style.background = c;
+    div.style.boxShadow = c === '#FFFFFF' ? 'inset 0 0 0 1px #ccc' : 'none';
+    div.onclick = () => {
+      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      div.classList.add('active');
+      textColor = c;
+    };
+    row.appendChild(div);
+  });
+}
+
+function addText() {
+  const input = document.getElementById('textInput');
+  const text = input.value.trim();
+  if (!text) { showToast('テキストを入力してください！'); return; }
+  const size = parseInt(document.getElementById('fontSizeSlider').value);
+  const layer = document.getElementById('stickerLayer');
+  const body = document.getElementById('cameraBody');
+  const w = body.offsetWidth;
+  const h = body.offsetHeight;
+
+  const el = document.createElement('div');
+  el.className = 'placed-sticker placed-text';
+  el.dataset.text = text;
+  el.dataset.color = textColor;
+  el.dataset.size = size;
+  el.dataset.emoji = text;
+  el.style.left = (w / 2 - text.length * size / 4) + 'px';
+  el.style.top = (h / 2 - size / 2) + 'px';
+  el.style.fontSize = size + 'px';
+  el.style.color = textColor;
+  el.style.fontFamily = '"M PLUS Rounded 1c", sans-serif';
+  el.style.fontWeight = '700';
+  el.style.textShadow = '1px 1px 0 rgba(255,255,255,0.8), -1px -1px 0 rgba(255,255,255,0.6)';
+  el.style.whiteSpace = 'nowrap';
+  el.style.transform = 'none';
+  el.dataset.rot = 0;
+  el.textContent = text;
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'sticker-del';
+  delBtn.textContent = '✕';
+  delBtn.onclick = (e) => { e.stopPropagation(); el.remove(); };
+  el.appendChild(delBtn);
+
+  makeDraggable(el, layer);
+  el.onclick = (e) => { e.stopPropagation(); selectSticker(el); };
+
+  layer.appendChild(el);
+  selectSticker(el);
+  input.value = '';
+  showToast(`✏️ テキスト追加！`);
+}
+
+// ========== Panels ==========
+function switchPanel(name) {
+  ['filters','stickers','frames','text'].forEach(p => {
+    document.getElementById(`panel-${p}`).style.display = p === name ? 'block' : 'none';
+  });
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === ['filters','stickers','frames','text'].indexOf(name));
+  });
+  activePanel = name;
+}
+
+// ========== Toast ==========
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ========== Start ==========
+init();
+window.addEventListener('resize', renderFrameOverlay);
+</script>
+</body>
+</html>
